@@ -1,0 +1,32 @@
+{
+  "ShowLogs": true,
+  "QMainWindow": [
+    {
+      "tittle": "FishClassifier"
+    }
+  ],
+  "QSettings": [
+    {
+      "ThemeSettings": [
+        {
+          "CustomTheme": [
+            {
+              "Background-color": "#000000",
+              "Text-color": "#FFFFFF",
+              "Accent-color": "#808080",
+              "Icons-color": "#FFFFFF",
+              "Theme-name": "Default-theme",
+              "Default-Theme": true
+            }
+          ]
+        }
+      ],
+      "AppSettings": {
+        "OrginizationName": "FishClassifier",
+        "ApplicationName": "FishClassifier Company",
+        "OrginizationDormain": "FishClassifier.org"
+      }
+    }
+  ],
+  "QtBinding": "PySide6"
+}
