@@ -1,12 +1,7 @@
 from cx_Freeze import setup, Executable
-# Packages
-from app.core.pyside_or_pyqt import * # Qt
-
-# GUIs
-# Modules
 
 # ADD FILES/FOLDERS
-files = ['icon.ico', 'settings.json','images/']
+files = ['icon.ico', 'settings.json', 'images/']
 
 # TARGET
 target = Executable(
@@ -17,10 +12,10 @@ target = Executable(
 
 # SETUP CX FREEZE
 setup(
-    name = "PyBlackBOX",
-    version = "1.0",
-    description = "Modern GUI for desktop chat",
-    author = "Wanderson M. Pimenta",
-    options = {'build_exe' : {'include_files' : files}},
-    executables = [target]    
+    name="PyBlackBOX",
+    version="1.0",
+    description="Modern GUI for desktop chat",
+    author="Wanderson M. Pimenta",
+    options={'build_exe': {'include_files': files}},
+    executables=[target]
 )
