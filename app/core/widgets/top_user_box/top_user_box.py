@@ -2,7 +2,11 @@ from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
+import app.modules.app_settings as app_setting_namespace
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 # TOP USER BOX
@@ -11,15 +15,14 @@ import os
 class TopUserInfo(QWidget):
     status = Signal(str)
 
-    def __init__(self, parent, left, top, my_name, my_description):
-        QWidget.__init__(self)
-
+    def __init__(self, parent, left, top, my_name, my_description, *args, **kwargs):
         # ICON PATH
         # ///////////////////////////////////////////////////////////////
-        image = "images/users/me.png"
-        icon_settings = "images/icons_svg/icon_settings.svg"
-        app_path = os.path.abspath(os.getcwd())
-        image_path = os.path.join(app_path, image)
+        super().__init__(parent, *args, **kwargs)
+        settings = app_setting_namespace.Settings()
+
+        image = settings["top_user_box"]["image"]
+        icon_settings = settings["top_user_box"]["icon_settings"]
 
         # INITIAL SETUP
         # ///////////////////////////////////////////////////////////////
@@ -32,7 +35,7 @@ class TopUserInfo(QWidget):
         self.user_name = my_name
         self.user_description = my_description
         self.user_status = "online"
-        self.user_image = image_path
+        self.user_image = os.path.join(os.path.abspath(os.getcwd()), image)
         self.icon_settings = QPixmap(icon_settings)
         self._status_color = "#46b946"
 
@@ -260,11 +263,12 @@ QFrame {
 class _ChangeStatus(QFrame):
     status = Signal(str)
 
-    def __init__(self, parent):
-        QFrame.__init__(self)
+    def __init__(self, parent, *args, **kwargs):
+        # QFrame.__init__(self)
 
         # SETUP
         # ///////////////////////////////////////////////////////////////
+        super().__init__(parent, *args, **kwargs)
         self.setFixedSize(230, 205)
         self.setStyleSheet(style)
         self.setParent(parent)

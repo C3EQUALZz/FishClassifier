@@ -14,6 +14,31 @@
         "color_hover": "#151617",
         "color_pressed": "#ACE500",
         "icon_color": "#E6E6E6",
-        "icon_color_pressed": "#151617"
-    }
+        "icon_color_pressed": "#151617",
+
+        "buttons": {
+            "add_new_friend": {
+                "icon_path": "app/resources/images/icons_svg/icon_add_user.svg",
+                "tooltip": "Add new friend"
+            },
+
+            "more_options": {
+                "icon_path": "app/resources/images/icons_svg/icon_more_options.svg",
+                "tooltip": "More options, test with many words"
+            },
+
+            "settings" : {
+                "icon_path": "app/resources/images/icons_svg/icon_settings.svg",
+                "tooltip": "Open settings"
+            }
+        }
+    },
+
+    "top_user_box": {
+        "image": "app/resources/images/users/me.png",
+        "icon_settings": "app/resources/images/icons_svg/icon_settings.svg"
+    },
+
+    "neural_networks_path": "app/resources/users.json"
+
 }

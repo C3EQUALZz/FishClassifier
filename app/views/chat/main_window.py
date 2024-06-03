@@ -55,7 +55,11 @@ class MainView(QMainWindow):
         # Add btns to page
         # ///////////////////////////////////////////////////////////////
 
-        self.add_menus(models_neural_network.NeuralNetworks(pathlib.Path('app/resources/users.json')).networks)
+        self.add_menus(
+            models_neural_network.NeuralNetworks(
+                pathlib.Path(self.settings["neural_networks_path"])
+            ).networks
+        )
 
     def add_menus(self, users) -> None:
         for _id, user in enumerate(users):
@@ -63,31 +67,20 @@ class MainView(QMainWindow):
             self.ui.messages_layout.addWidget(self.menu)
 
     def add_buttons_to_left_menu(self) -> None:
-        self.left_menu['custom_btn_top'] = LeftMenuButton(
-            self,
-            "custom_btn_top",
-            "app/resources/images/icons_svg/icon_add_user.svg",
-            "Add new friend"
-        )
+        button_config = self.settings['left_menu']['buttons']
+        for button_name, button_info in button_config.items():
+            button = LeftMenuButton(
+                self,
+                button_name,
+                button_info["icon_path"],
+                button_info["tooltip"]
+            )
+            self.left_menu[button_name] = button
 
-        self.left_menu['custom_btn_bottom_1'] = LeftMenuButton(
-            self,
-            "custom_btn_bottom_1",
-            "app/resources/images/icons_svg/icon_more_options.svg",
-            "More options, test with many words"
-        )
-
-        self.left_menu['custom_btn_bottom_2'] = LeftMenuButton(
-            self,
-            "custom_btn_bottom_2",
-            "app/resources/images/icons_svg/icon_settings.svg",
-            "Open settings"
-        )
-
-        # Add buttons to layouts
-        self.ui.top_menus_layout.addWidget(self.left_menu['custom_btn_top'])
-        self.ui.bottom_menus_layout.addWidget(self.left_menu['custom_btn_bottom_1'])
-        self.ui.bottom_menus_layout.addWidget(self.left_menu['custom_btn_bottom_2'])
+            if button_name == 'add_new_friend':
+                self.ui.top_menus_layout.addWidget(button)
+            else:
+                self.ui.bottom_menus_layout.addWidget(button)
 
     def show_window(self) -> None:
         """

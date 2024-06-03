@@ -1,18 +1,33 @@
-import json
-from pathlib import Path
 from typing import Any
+
+import json
+import logging
+import pathlib
+
+logger = logging.getLogger(__name__)
 
 
 class Settings:
     """
     Класс для работы с настройками приложения, хранящимися в JSON-файле.
     """
+    _instance = None
+
     json_file: str = "settings.json"
-    app_path: Path = Path.cwd()
-    settings_path: Path = app_path / json_file
+    app_path: pathlib.Path = pathlib.Path.cwd()
+    settings_path: pathlib.Path = app_path / json_file
 
     if not settings_path.is_file():
-        print(f"WARNING: \"settings.json\" not found! check in the folder {settings_path}")
+        logger.warning(f"\"settings.json\" not found! check in the folder {settings_path}")
+
+    def __new__(cls, *args, **kwargs) -> "Settings":
+        """
+        Singleton, так как к настройкам я могу обратиться в любом View,
+        соответственно для оптимизации выбран данный паттерн.
+        """
+        if not cls._instance:
+            cls._instance = super(Settings, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self) -> None:
         """

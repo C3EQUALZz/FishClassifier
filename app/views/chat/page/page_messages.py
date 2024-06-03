@@ -34,21 +34,17 @@ from app.views.chat.page.helpers.ui_page_messages import Ui_chat_page  # MainWin
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
 class Chat(QWidget):
-    def __init__(
-        self,
-        user_image,
-        user_name,
-        user_description,
-        user_id,
-        my_name,
-    ):
+    def __init__(self, user_image, user_name, user_description, user_id, my_name, parent, *args, **kwargs):
         QWidget.__init__(self)
 
+        super().__init__(parent, *args, **kwargs)
         self.page = Ui_chat_page()
         self.page.setupUi(self)
 
         # UPDATE INFO
-        self.page.user_image.setStyleSheet("#user_image { background-image: url(\"" + os.path.normpath(user_image).replace("\\", "/") + "\") }")
+        self.page.user_image.setStyleSheet("#user_image { background-image: url(\"" +
+                                           os.path.normpath(user_image).replace("\\", "/") + "\") }"
+                                           )
         self.page.user_name.setText(user_name)
         self.page.user_description.setText(user_description)
 
@@ -77,18 +73,21 @@ class Chat(QWidget):
 
     # ENTER / RETURN SEND MESSAGE
     def enter_return_release(self, event):
-        if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+        if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
             self.send_message()
 
     # SEND MESSAGE
     def send_message(self):
         if self.page.line_edit_message.text() != "":
             self.message = Message(self.page.line_edit_message.text(), True)
-            self.page.chat_messages_layout.addWidget(self.message, Qt.AlignCenter, Qt.AlignBottom)
+            self.page.chat_messages_layout.addWidget(self.message,
+                                                     Qt.AlignmentFlag.AlignCenter,
+                                                     Qt.AlignmentFlag.AlignBottom)
             self.page.line_edit_message.setText("")
 
             # SCROLL TO END            
-            QTimer.singleShot(10, lambda: self.page.messages_frame.setFixedHeight(self.page.chat_messages_layout.sizeHint().height()))
+            QTimer.singleShot(10, lambda: self.page.messages_frame.setFixedHeight(
+                self.page.chat_messages_layout.sizeHint().height()))
             QTimer.singleShot(15, lambda: self.scroll_to_end())
 
             # SEND USER MESSAGE
@@ -97,13 +96,15 @@ class Chat(QWidget):
     # SEND MESSAGE BY FRIEND
     def send_by_friend(self):
         self.message = Message(random.choice(self.messages), False)
-        self.page.chat_messages_layout.addWidget(self.message, Qt.AlignCenter, Qt.AlignBottom)
+        self.page.chat_messages_layout.addWidget(self.message,
+                                                 Qt.AlignmentFlag.AlignCenter,
+                                                 Qt.AlignmentFlag.AlignBottom)
         self.page.line_edit_message.setText("")
 
         # SCROLL TO END            
-        QTimer.singleShot(10, lambda: self.page.messages_frame.setFixedHeight(self.page.chat_messages_layout.sizeHint().height()))
+        QTimer.singleShot(10, lambda: self.page.messages_frame.setFixedHeight(
+            self.page.chat_messages_layout.sizeHint().height()))
         QTimer.singleShot(15, lambda: self.scroll_to_end())
-
 
     def scroll_to_end(self):
         # SCROLL TO END

@@ -33,8 +33,8 @@ send_by = None
 # MAIN WINDOW
 # ///////////////////////////////////////////////////////////////
 class Message(QWidget):
-    def __init__(self, message, me_send):
-        QWidget.__init__(self)
+    def __init__(self, message, me_send, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
         global send_by
         send_by = me_send
 
@@ -75,7 +75,7 @@ class Message(QWidget):
             border-radius: 20px;
             background-repeat: no-repeat;
             background-position: center;
-            background-image: url(:/icons_svg/images/icons_svg/icon_more_options.svg);
+            background-image: url(:app/resources/images/icons_svg/icon_more_options.svg);
         }
         QPushButton:hover {
             background-color: rgb(61, 62, 65);
@@ -107,9 +107,9 @@ class Message(QWidget):
         self.data_message.setText("date")
         self.data_message.setStyleSheet("font: 8pt 'Segoe UI'; color: #4c5154")
         if send_by:
-            self.data_message.setAlignment(Qt.AlignRight)
+            self.data_message.setAlignment(Qt.AlignmentFlag.AlignRight)
         else:
-            self.data_message.setAlignment(Qt.AlignLeft)
+            self.data_message.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         self.layout_inside.addWidget(self.message)
         self.layout_inside.addWidget(self.data_message)
