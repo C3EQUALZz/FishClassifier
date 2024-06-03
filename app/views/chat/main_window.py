@@ -2,12 +2,19 @@ import logging
 import pathlib
 import dataclasses
 
-from PySide6.QtWidgets import *
+from PySide6.QtWidgets import QMainWindow
 
-import app.modules.ui_functions.functions as ui_functions
 import app.models.neural_network_model as models_neural_network
-from app.core.widgets import *
-from app.modules.app_settings.settings import *
+import app.modules.ui_functions.functions as ui_functions
+
+from app.core.widgets import (
+    LeftMenu,
+    LeftMenuButton,
+    TopUserInfo,
+    FriendMessageButton,
+)
+
+from app.modules.app_settings.settings import Settings
 from app.views.chat.helpers.ui_main import UiMainWindow
 
 logger = logging.getLogger(__name__)
@@ -19,16 +26,14 @@ class MainView(QMainWindow):
         logger.debug("Инициализация MainView")
 
         self.dragPos = None
+        self.menu = None
+
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
         logger.debug("Настроился UiMainWindow")
 
-        # SET DEFAULT PAGE
-        # ///////////////////////////////////////////////////////////////
         self.ui.app_pages.setCurrentWidget(self.ui.home)
 
-        # LOAD DICT SETTINGS FROM "settings.json" FILE
-        # ///////////////////////////////////////////////////////////////
         self.settings = Settings()
         logger.debug("Инициализация Settings")
 
@@ -38,9 +43,6 @@ class MainView(QMainWindow):
         self.add_buttons_to_left_menu()
         logger.debug("Добавляет кнопки в левое меню")
 
-        # TOP USER BOX
-        # Add widget to App
-        # ///////////////////////////////////////////////////////////////
         self.top_user = TopUserInfo(self.ui.left_messages, 8, 64, "", "Writing python codes")
         self.top_user.setParent(self.ui.top_user_frame)
 
@@ -52,11 +54,8 @@ class MainView(QMainWindow):
         # ADD MESSAGE BTNS / FRIEND MENUS
         # Add btns to page
         # ///////////////////////////////////////////////////////////////
-        self.users = models_neural_network.NeuralNetworks(pathlib.Path('app/resources/users.json'))
 
-        self.menu = FriendMessageButton
-
-        self.add_menus(self.users.networks)
+        self.add_menus(models_neural_network.NeuralNetworks(pathlib.Path('app/resources/users.json')).networks)
 
     def add_menus(self, users) -> None:
         for _id, user in enumerate(users):
