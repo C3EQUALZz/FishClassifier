@@ -79,3 +79,7 @@ jupyter notebook
 - Увеличить производительность
 - Рефакторить код
 - Добавить автоматическое тестирование на GitHub
+
+### Contributors 
+
+- https://github.com/morrs1
