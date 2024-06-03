@@ -3,6 +3,7 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 import app.modules.app_settings as app_setting_namespace
+import app.core.widgets.top_user_box.helpers as top_user_box_helpers_namespace
 import logging
 import os
 
@@ -19,6 +20,7 @@ class TopUserInfo(QWidget):
         # ICON PATH
         # ///////////////////////////////////////////////////////////////
         super().__init__(parent, *args, **kwargs)
+        self.parent_widget = parent
         settings = app_setting_namespace.Settings()
 
         image = settings["top_user_box"]["image"]
@@ -37,7 +39,7 @@ class TopUserInfo(QWidget):
         self.user_status = "online"
         self.user_image = os.path.join(os.path.abspath(os.getcwd()), image)
         self.icon_settings = QPixmap(icon_settings)
-        self._status_color = "#46b946"
+        self.status_color = "#46b946"
 
         # DRAW BASE FRAME
         # ///////////////////////////////////////////////////////////////
@@ -51,67 +53,18 @@ class TopUserInfo(QWidget):
 
         # SETUP STATUS BOX
         # ///////////////////////////////////////////////////////////////
-        self.status_box = _ChangeStatus(parent)
+        self.status_box = top_user_box_helpers_namespace.StatusBox(self)
         self.status_box.move(left, top)
-        self.status_box.focusOutEvent = self.lost_focus_status_box
-        self.status_box.line_edit.focusOutEvent = self.lost_focus_line_edit
-        self.status_box.line_edit.keyReleaseEvent = self.change_description
-        self.status_box.hide()
-        self.status_box.status.connect(self.change_status)
-
-    def change_status(self, status: str) -> None:
-        """
-        CHANGE USER STATUS
-        Change when is connected with status signal
-        :param status:
-        :return:
-        """
-        if status == "online":
-            self._status_color = "#46b946"
-            self.repaint()
-        elif status == "idle":
-            self._status_color = "#ff9955"
-            self.repaint()
-        elif status == "busy":
-            self._status_color = "#a02c2c"
-            self.repaint()
-        elif status == "invisible":
-            self._status_color = "#808080"
-            self.repaint()
-        # EMIT SIGNAL
-        self.status.emit(status)
-
-    # CHANGE TEXT DESCRIPTION
-    # ///////////////////////////////////////////////////////////////
-    def change_description(self, event):
-        if event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter:
-            self.label_description.setText(self.status_box.line_edit.text())
-            self.status_box.line_edit.setText("")
-            self.status_box.hide()
-
-    # SHO HIDE DIALOP POPUP
-    # ///////////////////////////////////////////////////////////////
-    # HIDE LINE EDIT WHEN LOST FOCUS
-    def lost_focus_status_box(self, event):
-        if not self.status_box.line_edit.hasFocus():
-            self.status_box.hide()
-            self.status_box.line_edit.setText("")
-
-    # HIDE WHEN LOST FOCUS
-    def lost_focus_line_edit(self, event):
-        if not self.status_box.hasFocus():
-            self.status_box.hide()
-            self.status_box.line_edit.setText("")
 
     # OPEN STATUS BOX POPUP
     # ///////////////////////////////////////////////////////////////
     def mouse_press(self, event):
-        if self.status_box.isVisible():
-            self.status_box.hide()
-            self.status_box.line_edit.setText("")
+        if self.status_box.status_box.isVisible():
+            self.status_box.status_box.hide()
+            self.status_box.status_box.line_edit.setText("")
         else:
-            self.status_box.show()
-            self.status_box.line_edit.setFocus()
+            self.status_box.status_box.show()
+            self.status_box.status_box.line_edit.setFocus()
 
     # SHOW ICON
     # ///////////////////////////////////////////////////////////////
@@ -207,150 +160,8 @@ class TopUserInfo(QWidget):
         painter.setPen(pen)
 
         # BRUSH/STATUS COLOR
-        painter.setBrush(QBrush(QColor(self._status_color)))
+        painter.setBrush(QBrush(QColor(self.status_color)))
 
         # DRAW
         painter.drawEllipse(rect.x() + 27, rect.y() + 27, 13, 13)
         painter.end()
-
-
-# SET STYLE TO POPUP
-# ///////////////////////////////////////////////////////////////
-style = """
-/* QFrame */
-QFrame {
-    background: #333436; border-radius: 10px;
-}
-/* Search Message */
-.QLineEdit {
-	border: 2px solid rgb(47, 48, 50);
-	border-radius: 15px;
-	background-color: rgb(47, 48, 50);
-	color: rgb(121, 121, 121);
-	padding-left: 10px;
-	padding-right: 10px;
-}
-.QLineEdit:hover {
-	color: rgb(230, 230, 230);
-	border: 2px solid rgb(62, 63, 66);
-}
-.QLineEdit:focus {
-	color: rgb(230, 230, 230);
-	border: 2px solid rgb(53, 54, 56);
-	background-color: rgb(14, 14, 15);
-}
-/* QPushButton */
-.QPushButton{
-    background-color: transparent;
-    border: none;
-    border-radius: 10px;
-    background-repeat: no-repeat;
-    background-position: left center;
-    text-align: left;
-    color: #999999;
-    padding-left: 38px;
-}
-.QPushButton:hover{
-    background-color: #151617;
-    color: #CCCCCC;
-}
-
-"""
-
-
-# CHAN STATUS POPUP
-# # ///////////////////////////////////////////////////////////////
-class _ChangeStatus(QFrame):
-    status = Signal(str)
-
-    def __init__(self, parent, *args, **kwargs):
-        # QFrame.__init__(self)
-
-        # SETUP
-        # ///////////////////////////////////////////////////////////////
-        super().__init__(parent, *args, **kwargs)
-        self.setFixedSize(230, 205)
-        self.setStyleSheet(style)
-        self.setParent(parent)
-
-        # LAYOUT AND BORDER
-        # ///////////////////////////////////////////////////////////////
-        self.layout = QVBoxLayout(self)
-        self.layout.setContentsMargins(10, 10, 10, 10)
-        self.border = QFrame(self)
-        self.layout.addWidget(self.border)
-
-        # LINEEDIT AND BTNS BOX
-        # ///////////////////////////////////////////////////////////////
-        self.layout_content = QVBoxLayout(self.border)
-        self.layout_content.setContentsMargins(0, 0, 0, 0)
-        self.layout_content.setSpacing(1)
-
-        # CHANGE DESCRIPTION
-        # ///////////////////////////////////////////////////////////////
-        self.line_edit = QLineEdit()
-        self.line_edit.setMinimumHeight(30)
-        self.line_edit.setPlaceholderText("Write what you are doing...")
-
-        # TOP LABEL
-        # ///////////////////////////////////////////////////////////////
-        self.label = QLabel("Change status:")
-        self.label.setStyleSheet("padding-top: 5px; padding-bottom: 5px; color: rgb(121, 121, 121);")
-
-        # BTN ONLINE
-        # ///////////////////////////////////////////////////////////////
-        self.btn_online = QPushButton()
-        self.btn_online.setText("Online")
-        self.btn_online.setMinimumHeight(30)
-        self.btn_online.setStyleSheet("background-image: url(:/icons_svg/images/icons_svg/icon_online.svg)")
-        self.btn_online.clicked.connect(lambda: self.send_signal("online"))
-        self.btn_online.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        # BTNL ILDE
-        # ///////////////////////////////////////////////////////////////
-        self.btn_idle = QPushButton()
-        self.btn_idle.setText("Idle")
-        self.btn_idle.setMinimumHeight(30)
-        self.btn_idle.setStyleSheet("background-image: url(:/icons_svg/images/icons_svg/icon_idle.svg)")
-        self.btn_idle.clicked.connect(lambda: self.send_signal("idle"))
-        self.btn_idle.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        # BTN BUSE
-        # ///////////////////////////////////////////////////////////////
-        self.btn_busy = QPushButton()
-        self.btn_busy.setText("Do not disturb")
-        self.btn_busy.setMinimumHeight(30)
-        self.btn_busy.setStyleSheet("background-image: url(:/icons_svg/images/icons_svg/icon_busy.svg)")
-        self.btn_busy.clicked.connect(lambda: self.send_signal("busy"))
-        self.btn_busy.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        # BTN INVISIBLE
-        self.btn_invisible = QPushButton()
-        self.btn_invisible.setText("Invisible")
-        self.btn_invisible.setMinimumHeight(30)
-        self.btn_invisible.setStyleSheet("background-image: url(:/icons_svg/images/icons_svg/icon_invisible.svg)")
-        self.btn_invisible.clicked.connect(lambda: self.send_signal("invisible"))
-        self.btn_invisible.setCursor(Qt.CursorShape.PointingHandCursor)
-
-        # ADD WIDGETS TO LAYOUT
-        # ///////////////////////////////////////////////////////////////
-        self.layout_content.addWidget(self.line_edit)
-        self.layout_content.addWidget(self.label)
-        self.layout_content.addWidget(self.btn_online)
-        self.layout_content.addWidget(self.btn_idle)
-        self.layout_content.addWidget(self.btn_busy)
-        self.layout_content.addWidget(self.btn_invisible)
-
-        # SET DROP SHADOW
-        # ///////////////////////////////////////////////////////////////
-        self.shadow = QGraphicsDropShadowEffect(self)
-        self.shadow.setBlurRadius(15)
-        self.shadow.setXOffset(0)
-        self.shadow.setYOffset(0)
-        self.shadow.setColor(QColor(0, 0, 0, 160))
-        self.setGraphicsEffect(self.shadow)
-
-    # SEND SIGNAL TO TOP USER WIDGET
-    # ///////////////////////////////////////////////////////////////
-    def send_signal(self, status):
-        self.status.emit(status)

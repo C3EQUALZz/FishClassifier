@@ -1,18 +1,16 @@
 from app.core.abstract import AbstractController
 from app.views.chat.page.page_messages import Chat
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MainController(AbstractController):
     def __init__(self, view):
         super().__init__(view)
         self.view = view
-        self.view.top_user.status.connect(self.status_change)
         self.view.menu.clicked.connect(self.btn_clicked)
         self.view.menu.released.connect(self.btn_released)
-
-    @staticmethod
-    def status_change(status):
-        print(f"send signal: {status}")
 
     def btn_clicked(self):
         # GET BT CLICKED
