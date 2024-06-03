@@ -9,12 +9,19 @@ class MainController(AbstractController):
     def __init__(self, view):
         super().__init__(view)
         self.view = view
-        self.view.menu.clicked.connect(self.btn_clicked)
-        self.view.menu.released.connect(self.btn_released)
+        logger.debug("MainController инициализирован")
+
+        for neural_network in self.view.neural_networks:
+            neural_network.clicked.connect(self.btn_clicked)
+            neural_network.released.connect(self.btn_released)
+            logger.debug(f"Добавил сигнал для {neural_network}")
+        logger.debug("MainController сигналы подключены")
 
     def btn_clicked(self):
+        logger.debug("Запущен btn_clicked")
         # GET BT CLICKED
         btn = self.view.sender()
+        logger.debug(f'Нажата кнопка: {btn}')
 
         # UNSELECT CHATS
         self.view.ui.ui_functions.UiFunctions.deselect_other_chat_messages(self.view, btn.objectName())

@@ -22,6 +22,9 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 # Modules
 import os
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # FRIEND MENU MESSAGE / MESSAGE BUTTON
@@ -35,10 +38,10 @@ class FriendMessageButton(QWidget):
     def __init__(
             self,
             _id,
-            network_image,
-            network_name,
-            network_description,
-            network_status,
+            user_image,
+            user_name,
+            user_description,
+            user_status,
             unread_messages,
             is_active
     ):
@@ -46,16 +49,16 @@ class FriendMessageButton(QWidget):
 
         # ICON PATH
         # ///////////////////////////////////////////////////////////////
-        image = network_image
+        image = user_image
         app_path = os.path.abspath(os.getcwd())
         image_path = os.path.join(app_path, image)
 
         # CUSTOM PARAMETERS
         # ///////////////////////////////////////////////////////////////
         self.user_image = image_path
-        self.user_name = network_name
-        self.user_description = network_description
-        self.user_status = network_status
+        self.user_name = user_name
+        self.user_description = user_description
+        self.user_status = user_status
         self.unread_messages = unread_messages
         self.is_active = is_active
         self._status_color = "#46b946"
@@ -99,14 +102,16 @@ class FriendMessageButton(QWidget):
     # MOUSE PRESS
     # Event triggered when the left button is pressed
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        logger.debug(f"FriendMessageButton {self.objectName()} mousePressEvent")
+        if event.button() == Qt.LeftButton:
             # EMIT SIGNAL
             self.clicked.emit()
 
     # MOUSE RELEASE
     # Event fired when the mouse leaves the BTN
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        logger.debug(f"FriendMessageButton {self.objectName()} mouseReleaseEvent")
+        if event.button() == Qt.LeftButton:
             self.released.emit()
 
     # MOUSE ENTER
@@ -141,21 +146,21 @@ class FriendMessageButton(QWidget):
         # USER NAME
         self.label_user = QLabel(self.text_frame)
         self.label_user.setGeometry(0, 8, self.text_frame.width(), 20)
-        self.label_user.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.label_user.setAlignment(Qt.AlignVCenter)
         self.label_user.setText(self.user_name.capitalize())
         self.label_user.setStyleSheet("color: #e7e7e7; font: 700 10pt 'Segoe UI';")
 
         # USER STATUS
         self.label_description = QLabel(self.text_frame)
         self.label_description.setGeometry(0, 22, self.text_frame.width(), 18)
-        self.label_description.setAlignment(Qt.AlignmentFlag.AlignVCenter)
+        self.label_description.setAlignment(Qt.AlignVCenter)
         self.label_description.setText(self.user_description)
         self.label_description.setStyleSheet("color: #A6A6A6; font: 9pt 'Segoe UI';")
 
         # USER STATUS
         self.label_messages = QLabel(self)
         self.label_messages.setFixedSize(35, 20)
-        self.label_messages.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.label_messages.setAlignment(Qt.AlignCenter)
         self.label_messages.setStyleSheet("""
             background-color: #1e2021;
             padding-left: 5px;
@@ -175,8 +180,8 @@ class FriendMessageButton(QWidget):
         # PAINTER USER IMAGE
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
 
         # RECT
         rect = QRect(10, 5, 40, 40)
@@ -188,7 +193,7 @@ class FriendMessageButton(QWidget):
             painter.setBrush(QBrush(QColor(self._bg_color)))
         painter.drawRoundedRect(5, 0, 230, 50, 25, 25)
 
-        # CIRCLE        
+        # CIRCLE
         painter.setBrush(QBrush(QColor("#000000")))
         painter.drawEllipse(rect)
 
@@ -215,7 +220,7 @@ class FriendMessageButton(QWidget):
     def draw_status(self, status, rect):
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        painter.setRenderHint(QPainter.Antialiasing)
 
         # PEN
         pen = QPen()

@@ -1,19 +1,16 @@
 import logging
 import pathlib
-import dataclasses
 
 from PySide6.QtWidgets import QMainWindow
 
 import app.models.neural_network_model as models_neural_network
 import app.modules.ui_functions.functions as ui_functions
-
 from app.core.widgets import (
     LeftMenu,
     LeftMenuButton,
     TopUserInfo,
     FriendMessageButton,
 )
-
 from app.modules.app_settings.settings import Settings
 from app.views.chat.helpers.ui_main import UiMainWindow
 
@@ -26,7 +23,7 @@ class MainView(QMainWindow):
         logger.debug("Инициализация MainView")
 
         self.dragPos = None
-        self.menu = None
+        self.neural_networks = []
 
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
@@ -63,8 +60,18 @@ class MainView(QMainWindow):
 
     def add_menus(self, users) -> None:
         for _id, user in enumerate(users):
-            self.menu = FriendMessageButton(_id, **dataclasses.asdict(user))
-            self.ui.messages_layout.addWidget(self.menu)
+            neural_network = FriendMessageButton(_id,
+                                                 user_image=user.network_image,
+                                                 user_name=user.network_name,
+                                                 user_description=user.network_description,
+                                                 user_status=user.network_status,
+                                                 unread_messages=user.unread_messages,
+                                                 is_active=user.is_active)
+
+            self.neural_networks.append(neural_network)
+
+            logger.debug(f"Кнопка добавлена: {neural_network.objectName()}")
+            self.ui.messages_layout.addWidget(neural_network)
 
     def add_buttons_to_left_menu(self) -> None:
         button_config = self.settings['left_menu']['buttons']

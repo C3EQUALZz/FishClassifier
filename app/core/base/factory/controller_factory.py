@@ -17,7 +17,7 @@ class ControllerFactory:
     """
 
     @staticmethod
-    def create_controller(view: interfaces_namespace.ViewStrategy) -> base_namespace.AbstractController:
+    def create_controller(view: interfaces_namespace.ViewStrategy) -> base_namespace.AbstractController | None:
         """
         Создает и возвращает контроллер, соответствующий данному представлению.
 
@@ -30,3 +30,6 @@ class ControllerFactory:
         if isinstance(view, views_namespace.LoginView):
             logger.debug("В ControllerFactory.create_controller выбран LoginController")
             return login_namespace.LoginController(view)
+
+        logger.warning(f"Неизвестное представление: {type(view)}")
+        return None
