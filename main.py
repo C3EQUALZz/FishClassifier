@@ -19,18 +19,29 @@ def setup_logger() -> None:
     Настройка логирования
     :return: ничего не возвращает только инициализация
     """
+    folder = pathlib.Path("app/logs")
+
+    if not folder.exists():
+        folder.mkdir()
+
     config_file = pathlib.Path("app/config/logger_config_log.json")
+
     with open(config_file, "r") as f_in:
         config = json.load(f_in)
 
     logging.config.dictConfig(config)
+
     queue_handler = logging.getHandlerByName("queue_handler")
+
     if queue_handler is not None:
         queue_handler.listener.start()
         atexit.register(queue_handler.listener.stop)
 
 
 def main() -> None:
+    """
+    Точка запуска приложения
+    """
     setup_logger()
     app = QApplication(sys.argv)
     logger.debug("Запуск приложения")
