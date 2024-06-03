@@ -1,0 +1,18 @@
+[
+    {
+        "network_image": "app/resources/images/users/cat.png",
+        "network_name": "Tom",
+        "network_description": "Did you see a mouse?",
+        "network_status": "online",
+        "unread_messages": 2,
+        "is_active": false
+    },
+    {
+        "network_image": "app/resources/images/users/mouse.png",
+        "network_name": "Jerry",
+        "network_description": "I think I saw a cat...",
+        "network_status": "busy",
+        "unread_messages": 1,
+        "is_active": true
+    }
+]

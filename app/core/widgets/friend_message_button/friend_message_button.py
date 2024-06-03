@@ -35,10 +35,10 @@ class FriendMessageButton(QWidget):
     def __init__(
             self,
             _id,
-            user_image,
-            user_name,
-            user_description,
-            user_status,
+            network_image,
+            network_name,
+            network_description,
+            network_status,
             unread_messages,
             is_active
     ):
@@ -46,16 +46,16 @@ class FriendMessageButton(QWidget):
 
         # ICON PATH
         # ///////////////////////////////////////////////////////////////
-        image = user_image
+        image = network_image
         app_path = os.path.abspath(os.getcwd())
         image_path = os.path.join(app_path, image)
 
         # CUSTOM PARAMETERS
         # ///////////////////////////////////////////////////////////////
         self.user_image = image_path
-        self.user_name = user_name
-        self.user_description = user_description
-        self.user_status = user_status
+        self.user_name = network_name
+        self.user_description = network_description
+        self.user_status = network_status
         self.unread_messages = unread_messages
         self.is_active = is_active
         self._status_color = "#46b946"

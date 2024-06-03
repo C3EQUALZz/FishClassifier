@@ -1,8 +1,11 @@
 import logging
+import pathlib
+import dataclasses
 
 from PySide6.QtWidgets import *
 
 import app.modules.ui_functions.functions as ui_functions
+import app.models.neural_network_model as models_neural_network
 from app.core.widgets import *
 from app.modules.app_settings.settings import *
 from app.views.chat.helpers.ui_main import UiMainWindow
@@ -38,7 +41,7 @@ class MainView(QMainWindow):
         # TOP USER BOX
         # Add widget to App
         # ///////////////////////////////////////////////////////////////
-        self.top_user = TopUserInfo(self.ui.left_messages, 8, 64, "wanderson", "Writing python codes")
+        self.top_user = TopUserInfo(self.ui.left_messages, 8, 64, "", "Writing python codes")
         self.top_user.setParent(self.ui.top_user_frame)
 
         # SET UI DEFINITIONS
@@ -49,44 +52,16 @@ class MainView(QMainWindow):
         # ADD MESSAGE BTNS / FRIEND MENUS
         # Add btns to page
         # ///////////////////////////////////////////////////////////////
-        add_user = [
-            {
-                "user_image": "images/users/cat.png",
-                "user_name": "Tom",
-                "user_description": "Did you see a mouse?",
-                "user_status": "online",
-                "unread_messages": 2,
-                "is_active": False
-            },
-            {
-                "user_image": "images/users/mouse.png",
-                "user_name": "Jerry",
-                "user_description": "I think I saw a cat...",
-                "user_status": "busy",
-                "unread_messages": 1,
-                "is_active": False
-            },
+        self.users = models_neural_network.NeuralNetworks(pathlib.Path('app/resources/users.json'))
 
-        ]
         self.menu = FriendMessageButton
 
-        self.add_menus(add_user)
+        self.add_menus(self.users.networks)
 
-    def add_menus(self, parameters):
-        _id = 0
-        for parameter in parameters:
-            user_image = parameter['user_image']
-            user_name = parameter['user_name']
-            user_description = parameter['user_description']
-            user_status = parameter['user_status']
-            unread_messages = parameter['unread_messages']
-            is_active = parameter['is_active']
-
-            self.menu = FriendMessageButton(
-                _id, user_image, user_name, user_description, user_status, unread_messages, is_active
-            )
+    def add_menus(self, users) -> None:
+        for _id, user in enumerate(users):
+            self.menu = FriendMessageButton(_id, **dataclasses.asdict(user))
             self.ui.messages_layout.addWidget(self.menu)
-            _id += 1
 
     def add_buttons_to_left_menu(self) -> None:
         self.left_menu['custom_btn_top'] = LeftMenuButton(
