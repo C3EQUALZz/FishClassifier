@@ -1,0 +1,2 @@
+from .friend_message import FriendMessageStrategy
+from .current_user_message import UserMessageStrategy

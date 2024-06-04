@@ -1,21 +1,20 @@
 import logging
 import pathlib
-import dataclasses
+import app.controllers.main as chat_namespace
 
 from PySide6.QtWidgets import QMainWindow
 
 import app.models.neural_network_model as models_neural_network
 import app.modules.ui_functions.functions as ui_functions
-
 from app.core.widgets import (
     LeftMenu,
     LeftMenuButton,
     TopUserInfo,
     FriendMessageButton,
 )
-
 from app.modules.app_settings.settings import Settings
 from app.views.chat.helpers.ui_main import UiMainWindow
+from app.views.chat.page.page_messages import Chat
 
 logger = logging.getLogger(__name__)
 
@@ -24,18 +23,25 @@ class MainView(QMainWindow):
     def __init__(self):
         super().__init__()
         logger.debug("Инициализация MainView")
+        self.settings = Settings()
+        logger.debug("Инициализация Settings")
 
         self.dragPos = None
-        self.menu = None
+        self.neural_networks: list[FriendMessageButton] = []
 
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
         logger.debug("Настроился UiMainWindow")
 
-        self.ui.app_pages.setCurrentWidget(self.ui.home)
+        self.ui_functions = ui_functions.UiFunctions
 
-        self.settings = Settings()
-        logger.debug("Инициализация Settings")
+        self.add_chat_networks(
+            models_neural_network.NeuralNetworks(
+                pathlib.Path(self.settings["neural_networks_path"])
+            ).networks
+        )
+
+        self.ui.app_pages.setCurrentWidget(self.ui.home)
 
         self.left_menu = LeftMenu()
         logger.debug("Инициализация LeftMenu")
@@ -46,25 +52,18 @@ class MainView(QMainWindow):
         self.top_user = TopUserInfo(self.ui.left_messages, 8, 64, "", "Writing python codes")
         self.top_user.setParent(self.ui.top_user_frame)
 
-        # SET UI DEFINITIONS
-        # Run set_ui_definitions() in the ui_functions.py
-        # ///////////////////////////////////////////////////////////////
-        ui_functions.UiFunctions.set_ui_definitions(self)
+        self.ui_functions.set_ui_definitions(self)
 
-        # ADD MESSAGE BTNS / FRIEND MENUS
-        # Add btns to page
-        # ///////////////////////////////////////////////////////////////
+    def add_chat_networks(self, networks: list[models_neural_network.NeuralNetwork]) -> None:
+        for _id, network in enumerate(networks):
+            neural_network = FriendMessageButton(_id, network)
 
-        self.add_menus(
-            models_neural_network.NeuralNetworks(
-                pathlib.Path(self.settings["neural_networks_path"])
-            ).networks
-        )
+            self.neural_networks.append(neural_network)
+            neural_network.clicked.connect(self.btn_clicked)
+            neural_network.released.connect(self.btn_released)
 
-    def add_menus(self, users) -> None:
-        for _id, user in enumerate(users):
-            self.menu = FriendMessageButton(_id, **dataclasses.asdict(user))
-            self.ui.messages_layout.addWidget(self.menu)
+            logger.debug(f"Кнопка добавлена: {neural_network.objectName()}")
+            self.ui.messages_layout.addWidget(neural_network)
 
     def add_buttons_to_left_menu(self) -> None:
         button_config = self.settings['left_menu']['buttons']
@@ -91,3 +90,61 @@ class MainView(QMainWindow):
 
     def hide_window(self) -> None:
         self.close()
+
+    def btn_clicked(self):
+        logger.debug("Запущен btn_clicked")
+        last_pressed_button: FriendMessageButton = self.sender()
+        logger.debug(f'Нажата кнопка: {last_pressed_button}')
+
+        # UNSELECT CHATS
+        self.ui_functions.deselect_other_chat_messages(self, last_pressed_button.objectName())
+
+        # SELECT CLICKED
+        if last_pressed_button.objectName():
+            last_pressed_button.reset_unread_message()
+            self.ui_functions.select_chat_message(self, last_pressed_button.objectName())
+
+        # LOAD CHAT PAGE
+        if last_pressed_button.objectName():
+            # REMOVE CHAT
+            for chat in reversed(range(self.ui.chat_layout.count())):
+                self.ui.chat_layout.itemAt(chat).widget().deleteLater()
+
+            view = Chat(my_name=self.top_user.user_name,
+                        image_path=last_pressed_button.user_image)
+
+            model = None
+
+            if last_pressed_button.objectName() == "0":
+                model = "MobileNetV2"
+
+            if last_pressed_button.objectName == "1":
+                model = "VGG16"
+
+            if last_pressed_button.objectName == "3":
+                model = "MyModelBetter"
+
+            self.chat = chat_namespace.ChatController(view=view,
+                                                      model=model,
+                                                      network=last_pressed_button.network,
+                                                      my_name=self.top_user.user_name)
+
+            # SET CHAT WIDGET
+            # self.chat = Chat(network=last_pressed_button.network,
+            #                  my_name=self.top_user.user_name,
+            #                  image_path=last_pressed_button.user_image,
+            #                  parent=self)
+
+            # ADD WIDGET TO LAYOUT
+            self.ui.chat_layout.addWidget(view)
+
+            # JUMP TO CHAT PAGE
+            self.ui.app_pages.setCurrentWidget(self.ui.chat)
+
+        # DEBUG
+        print(f"Button {last_pressed_button.objectName()}, clicked!")
+
+    def btn_released(self):
+        # GET BT CLICKED
+        btn = self.sender()
+        print(F"Button {btn.objectName()}, released!")

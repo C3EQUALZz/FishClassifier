@@ -3,6 +3,9 @@ from typing import Deque, Optional, Type
 
 import app.core.base.factory as factories_namespace
 import app.core.interfaces as interfaces_namespace
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class WindowManager:
@@ -26,27 +29,42 @@ class WindowManager:
     def switch_to_window(self, window_type: str) -> None:
 
         if self._view_factory is None or self._controller_factory is None:
-            raise Exception('View factory or controller factory must be set')
+            logger.exception('Необходимо установить ViewFactory или ControllerFactory')
+            raise Exception('Необходимо установить ViewFactory или ControllerFactory')
 
-        # Получение View и Controller через фабрики
-        view = self._view_factory.create_view(window_type)
-        controller = self._controller_factory.create_controller(view)
+        self.view = self._view_factory.create_view(window_type)
+        logger.debug(f"Показываем новое окно: {self.view}")
 
-        # Закрытие текущего окна, если оно есть
+        self.controller = self._controller_factory.create_controller(self.view)
+
+        logger.debug(f"Создан view: {self.view}, controller: {self.controller}")
+
         if self._window_history:
-            self._window_history[-1].hide_window()
+            current_view = self._window_history[-1]
+            logger.debug(f"Прячу текущее окно: {current_view}")
+            current_view.hide_window()
 
-        # Добавление нового окна в историю и его открытие
-        self._window_history.append(view)
-        view.show_window()
-        # controller.initialize()
+        self._window_history.append(self.view)
+        self.view.show_window()
+        self.controller.initialize()
 
     def go_back(self):
         # Возврат к предыдущему окну в истории
         if len(self._window_history) > 1:
             current_window = self._window_history.pop()
+            logger.debug(f"Закрываю текущее окно: {current_window}")
             current_window.close_window()
-            self._window_history[-1].show_window()
+
+            previous_window = self._window_history[-1]
+            logger.debug(f"Показываю прошлое окно: {previous_window}")
+            previous_window.show_window()
 
     def get_current_window(self):
-        return self._window_history[-1]
+
+        if self._window_history:
+            current_window = self._window_history[-1]
+            logger.debug(f"Текущее окно: {current_window}")
+            return current_window
+
+        logger.debug("Нет текущего окна")
+        return None

@@ -16,7 +16,7 @@ from PySide6.QtWidgets import *
 class UiMainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"MainWindow")
+            MainWindow.setObjectName(u"MainView")
         MainWindow.resize(1200, 720)
         self.stylesheet = QWidget(MainWindow)
         self.stylesheet.setObjectName(u"stylesheet")
