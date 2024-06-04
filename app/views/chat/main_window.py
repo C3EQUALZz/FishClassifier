@@ -19,6 +19,7 @@ from app.views.chat.page.page_messages import Chat
 from neuron_interaction.custom_model import CustomModel
 from neuron_interaction.mobileNetV2_model import MobileNetV2Model
 from neuron_interaction.vgg16_model import VGG16Model
+from neuron_interaction.custom_model_better import CustomModelBetter
 
 logger = logging.getLogger(__name__)
 
@@ -125,11 +126,11 @@ class MainView(QMainWindow):
             if last_pressed_button.objectName() == "1":
                 model = VGG16Model()
 
-            if last_pressed_button.objectName() == "3":
+            if last_pressed_button.objectName() == "2":
                 model = MobileNetV2Model()
 
-            if last_pressed_button.objectName() == "4":
-                model = "MyModel"
+            if last_pressed_button.objectName() == "3":
+                model = CustomModelBetter()
 
             self.chat = chat_namespace.ChatController(view=view,
                                                       model=model,

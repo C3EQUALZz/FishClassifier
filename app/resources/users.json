@@ -1,18 +1,35 @@
 [
     {
-        "network_image": "app/resources/images/users/cat.png",
-        "network_name": "Tom",
-        "network_description": "Did you see a mouse?",
+        "network_image": "app/resources/images/users/image(3).png",
+        "network_name": "CustomModel",
+        "network_description": "Я не умный",
         "network_status": "online",
         "unread_messages": 2,
         "is_active": false
     },
     {
-        "network_image": "app/resources/images/users/mouse.png",
-        "network_name": "Jerry",
-        "network_description": "I think I saw a cat...",
-        "network_status": "busy",
+        "network_image": "app/resources/images/users/image(4).png",
+        "network_name": "VGG16Model",
+        "network_description": "Я умный",
+        "network_status": "online",
         "unread_messages": 1,
+        "is_active": true
+    },
+    {
+        "network_image": "app/resources/images/users/image(5).png",
+        "network_name": "MobileNetV2Model",
+        "network_description": "Я очень умный",
+        "network_status": "busy",
+        "unread_messages": 15,
+        "is_active": true
+    },
+
+    {
+        "network_image": "app/resources/images/users/image(6).png",
+        "network_name": "CustomModelBetter",
+        "network_description": "Иванушка дурачок",
+        "network_status": "online",
+        "unread_messages": 0,
         "is_active": true
     }
 ]
