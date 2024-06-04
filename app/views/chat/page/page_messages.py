@@ -51,22 +51,37 @@ class Chat(QWidget):
 
     def add_user_message(self, message):
         user_message_label = QLabel(message)
-        user_message_label.setStyleSheet("background-color: lightblue; border-radius: 5px; padding: 5px;")
+        user_message_label.setStyleSheet("""
+        background-color: #0e0e0f;
+        border-radius: 10px;
+        margin-right: 75px;
+        margin-left: 75px;
+        margin-bottom: 15px;
+        padding: 30px;
+        font-size: 20px;
+        """)
         self.page.chat_messages_layout.addWidget(user_message_label)
 
     def add_friend_message(self, message):
         friend_message_label = QLabel(message)
-        friend_message_label.setStyleSheet("background-color: lightgreen; border-radius: 5px; padding: 5px;")
+        friend_message_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
+        friend_message_label.setStyleSheet("""
+        border-radius: 10px;
+        padding: 30px;
+        font-size: 20px;
+        text-align: center;
+        """)
         self.page.chat_messages_layout.addWidget(friend_message_label)
 
     def add_image_message(self, image_path, sender):
         image_label = QLabel()
         pixmap = QPixmap(image_path)
-        image_label.setPixmap(pixmap.scaled(100, 100, Qt.AspectRatioMode.KeepAspectRatio))  # Adjust the size as needed
+        image_label.setPixmap(pixmap.scaled(image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))  # Adjust the size as needed
+        image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         if sender == "user":
-            image_label.setStyleSheet("background-color: lightblue; border-radius: 5px; padding: 5px;")
+            image_label.setStyleSheet("background-color: #28282b; border-radius: 5px; padding: 5px;")
         elif sender == "friend":
-            image_label.setStyleSheet("background-color: lightgreen; border-radius: 5px; padding: 5px;")
+            image_label.setStyleSheet("background-color: #28282b; border-radius: 5px; padding: 5px;")
         self.page.chat_messages_layout.addWidget(image_label)
 
     def scroll_to_end(self):
