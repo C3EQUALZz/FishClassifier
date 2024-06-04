@@ -137,15 +137,6 @@ class TopUserInfo(QWidget):
         # DRAW USER IMAGE
         self.draw_status(self.user_image, rect)
 
-    # DRAW USER IMAGE
-    # ///////////////////////////////////////////////////////////////
-    def draw_user_image(self, qp, image, rect):
-        user_image = QImage(image)
-        path = QPainterPath()
-        path.addEllipse(rect)
-        qp.setClipPath(path)
-        qp.drawImage(rect, user_image)
-
     # DRAW STATUS
     # ///////////////////////////////////////////////////////////////
     def draw_status(self, status, rect):
@@ -165,3 +156,11 @@ class TopUserInfo(QWidget):
         # DRAW
         painter.drawEllipse(rect.x() + 27, rect.y() + 27, 13, 13)
         painter.end()
+
+    @staticmethod
+    def draw_user_image(qp, image, rect):
+        user_image = QImage(image)
+        path = QPainterPath()
+        path.addEllipse(rect)
+        qp.setClipPath(path)
+        qp.drawImage(rect, user_image)
