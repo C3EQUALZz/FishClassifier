@@ -1,6 +1,6 @@
 import logging
 import pathlib
-import dataclasses
+import app.controllers.main as chat_namespace
 
 from PySide6.QtWidgets import QMainWindow
 
@@ -12,7 +12,6 @@ from app.core.widgets import (
     TopUserInfo,
     FriendMessageButton,
 )
-
 from app.modules.app_settings.settings import Settings
 from app.views.chat.helpers.ui_main import UiMainWindow
 from app.views.chat.page.page_messages import Chat
@@ -53,18 +52,11 @@ class MainView(QMainWindow):
         self.top_user = TopUserInfo(self.ui.left_messages, 8, 64, "", "Writing python codes")
         self.top_user.setParent(self.ui.top_user_frame)
 
-        # SET UI DEFINITIONS
-        # Run set_ui_definitions() in the ui_functions.py
-        # ///////////////////////////////////////////////////////////////
         self.ui_functions.set_ui_definitions(self)
 
-        # ADD MESSAGE BTNS / FRIEND MENUS
-        # Add btns to page
-        # ///////////////////////////////////////////////////////////////
-
     def add_chat_networks(self, networks: list[models_neural_network.NeuralNetwork]) -> None:
-        for _id, user in enumerate(networks):
-            neural_network = FriendMessageButton(_id, **dataclasses.asdict(user))
+        for _id, network in enumerate(networks):
+            neural_network = FriendMessageButton(_id, network)
 
             self.neural_networks.append(neural_network)
             neural_network.clicked.connect(self.btn_clicked)
@@ -101,37 +93,56 @@ class MainView(QMainWindow):
 
     def btn_clicked(self):
         logger.debug("Запущен btn_clicked")
-        # GET BT CLICKED
-        btn = self.sender()
-        logger.debug(f'Нажата кнопка: {btn}')
+        last_pressed_button: FriendMessageButton = self.sender()
+        logger.debug(f'Нажата кнопка: {last_pressed_button}')
 
         # UNSELECT CHATS
-        self.ui_functions.deselect_other_chat_messages(self, btn.objectName())
+        self.ui_functions.deselect_other_chat_messages(self, last_pressed_button.objectName())
 
         # SELECT CLICKED
-        if btn.objectName():
-            btn.reset_unread_message()
-            self.ui_functions.select_chat_message(self, btn.objectName())
+        if last_pressed_button.objectName():
+            last_pressed_button.reset_unread_message()
+            self.ui_functions.select_chat_message(self, last_pressed_button.objectName())
 
         # LOAD CHAT PAGE
-        if btn.objectName():
+        if last_pressed_button.objectName():
             # REMOVE CHAT
             for chat in reversed(range(self.ui.chat_layout.count())):
                 self.ui.chat_layout.itemAt(chat).widget().deleteLater()
-            self.chat = None
+
+            view = Chat(my_name=self.top_user.user_name,
+                        image_path=last_pressed_button.user_image)
+
+            model = None
+
+            if last_pressed_button.objectName() == "0":
+                model = "MobileNetV2"
+
+            if last_pressed_button.objectName == "1":
+                model = "VGG16"
+
+            if last_pressed_button.objectName == "3":
+                model = "MyModelBetter"
+
+            self.chat = chat_namespace.ChatController(view=view,
+                                                      model=model,
+                                                      network=last_pressed_button.network,
+                                                      my_name=self.top_user.user_name)
 
             # SET CHAT WIDGET
-            self.chat = Chat(btn.user_image, btn.user_name, btn.user_description, btn.objectName(),
-                             self.top_user.user_name, parent=self)
+            # self.chat = Chat(network=last_pressed_button.network,
+            #                  my_name=self.top_user.user_name,
+            #                  image_path=last_pressed_button.user_image,
+            #                  parent=self)
 
             # ADD WIDGET TO LAYOUT
-            self.ui.chat_layout.addWidget(self.chat)
+            self.ui.chat_layout.addWidget(view)
 
             # JUMP TO CHAT PAGE
             self.ui.app_pages.setCurrentWidget(self.ui.chat)
 
         # DEBUG
-        print(f"Button {btn.objectName()}, clicked!")
+        print(f"Button {last_pressed_button.objectName()}, clicked!")
 
     def btn_released(self):
         # GET BT CLICKED

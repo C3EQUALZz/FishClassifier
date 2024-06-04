@@ -13,16 +13,13 @@ class FriendMessageButton(QWidget):
     clicked = Signal()
     released = Signal()
 
-    def __init__(self, _id, network_image, network_name, network_description, network_status, unread_messages,
-                 is_active):
+    def __init__(self, _id, user):
         super().__init__()
 
-        self.user_image = os.path.join(os.path.abspath(os.getcwd()), network_image)
-        self.user_name = network_name
-        self.user_description = network_description
-        self.user_status = network_status
-        self.unread_messages = unread_messages
-        self.is_active = is_active
+        self.network = user
+
+        self.user_image = os.path.join(os.path.abspath(os.getcwd()), user.network_image)
+
         self._status_color = "#46b946"
         self.bg_color_entered = "#22CCCCCC"
         self.bg_color_leave = "#00000000"
@@ -34,24 +31,24 @@ class FriendMessageButton(QWidget):
         self.setObjectName(str(_id))
         self.setup_ui()
 
-        if self.unread_messages > 0:
+        if self.network.unread_messages > 0:
             self.label_messages.show()
-            self.label_messages.setText(str(self.unread_messages))
+            self.label_messages.setText(str(self.network.unread_messages))
 
-        if self.user_status == "online":
+        if self.network.network_status == "online":
             self._status_color = "#46b946"
-        elif self.user_status == "idle":
+        elif self.network.network_status == "idle":
             self._status_color = "#ff9955"
-        elif self.user_status == "busy":
+        elif self.network.network_status == "busy":
             self._status_color = "#a02c2c"
-        elif self.user_status == "invisible":
+        elif self.network.network_status == "invisible":
             self._status_color = "#808080"
             self.opacity = QGraphicsOpacityEffect()
             self.opacity.setOpacity(0.4)
             self.setGraphicsEffect(self.opacity)
 
     def reset_unread_message(self):
-        self.unread_messages = 0
+        self.network.unread_messages = 0
         self.label_messages.hide()
         self.repaint()
 
@@ -64,17 +61,17 @@ class FriendMessageButton(QWidget):
             self.released.emit()
 
     def enterEvent(self, event):
-        if not self.is_active:
+        if not self.network.is_active:
             self._bg_color = self.bg_color_entered
             self.repaint()
 
     def leaveEvent(self, event):
-        if not self.is_active:
+        if not self.network.is_active:
             self._bg_color = self.bg_color_leave
             self.repaint()
 
     def set_active(self, active):
-        self.is_active = active
+        self.network.is_active = active
         self._bg_color = self.bg_color_leave if not active else self.bg_color_active
         self.repaint()
 
@@ -85,13 +82,13 @@ class FriendMessageButton(QWidget):
         self.label_user = QLabel(self.text_frame)
         self.label_user.setGeometry(0, 8, self.text_frame.width(), 20)
         self.label_user.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.label_user.setText(self.user_name.capitalize())
+        self.label_user.setText(self.network.network_name.capitalize())
         self.label_user.setStyleSheet("color: #e7e7e7; font: 700 10pt 'Segoe UI';")
 
         self.label_description = QLabel(self.text_frame)
         self.label_description.setGeometry(0, 22, self.text_frame.width(), 18)
         self.label_description.setAlignment(Qt.AlignmentFlag.AlignVCenter)
-        self.label_description.setText(self.user_description)
+        self.label_description.setText(self.network.network_description)
         self.label_description.setStyleSheet("color: #A6A6A6; font: 9pt 'Segoe UI';")
 
         self.label_messages = QLabel(self)
@@ -117,7 +114,7 @@ class FriendMessageButton(QWidget):
 
         rect = QRect(10, 5, 40, 40)
 
-        painter.setBrush(QBrush(QColor(self._bg_color if not self.is_active else self.bg_color_active)))
+        painter.setBrush(QBrush(QColor(self._bg_color if not self.network.is_active else self.bg_color_active)))
         painter.drawRoundedRect(5, 0, 230, 50, 25, 25)
 
         painter.setBrush(QBrush(QColor("#000000")))
@@ -127,7 +124,7 @@ class FriendMessageButton(QWidget):
 
         painter.end()
 
-        if self.user_status != "invisible":
+        if self.network.network_status != "invisible":
             self.draw_status(self.user_image, rect)
 
     @staticmethod

@@ -1,19 +1,14 @@
-from app.core.abstract import AbstractController
-from app.views.chat.page.page_messages import Chat
-from PySide6 import QtCore
 import logging
-from abc import ABCMeta
-import app.views.chat.main_window as main_window_namespace
+
+from PySide6 import QtCore
+
+from app.views.chat.page.page_messages import Chat
 
 logger = logging.getLogger(__name__)
 
 
-class MainControllerMeta(type(QtCore.QObject), ABCMeta):
-    pass
-
-
-class MainController(AbstractController, QtCore.QObject, metaclass=MainControllerMeta):
-    def __init__(self, view: main_window_namespace.MainView):
+class MainController(QtCore.QObject):
+    def __init__(self, view):
         super().__init__(view)
         self.view = view
         logger.debug(f"MainController принял view: {view}")
