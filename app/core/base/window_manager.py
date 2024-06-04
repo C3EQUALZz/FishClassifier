@@ -32,21 +32,21 @@ class WindowManager:
             logger.exception('Необходимо установить ViewFactory или ControllerFactory')
             raise Exception('Необходимо установить ViewFactory или ControllerFactory')
 
-        view = self._view_factory.create_view(window_type)
-        logger.debug(f"Показываем новое окно: {view}")
-        view.show_window()
+        self.view = self._view_factory.create_view(window_type)
+        logger.debug(f"Показываем новое окно: {self.view}")
 
-        controller = self._controller_factory.create_controller(view)
+        self.controller = self._controller_factory.create_controller(self.view)
 
-        logger.debug(f"Создан view: {view}, controller: {controller}")
+        logger.debug(f"Создан view: {self.view}, controller: {self.controller}")
 
         if self._window_history:
             current_view = self._window_history[-1]
             logger.debug(f"Прячу текущее окно: {current_view}")
             current_view.hide_window()
 
-        self._window_history.append(view)
-        controller.initialize()
+        self._window_history.append(self.view)
+        self.view.show_window()
+        self.controller.initialize()
 
     def go_back(self):
         # Возврат к предыдущему окну в истории
