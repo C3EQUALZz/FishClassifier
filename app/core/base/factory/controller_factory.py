@@ -31,5 +31,5 @@ class ControllerFactory:
             logger.debug("В ControllerFactory.create_controller выбран LoginController")
             return login_namespace.LoginController(view)
 
-        logger.warning(f"Неизвестное представление: {type(view)}")
-        return None
+        logger.exception(f"Неизвестное представление: {type(view)}")
+        raise ValueError(f"Неизвестное представление: {type(view)}")

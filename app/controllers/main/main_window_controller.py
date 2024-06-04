@@ -1,16 +1,18 @@
 from app.core.abstract import AbstractController
 from app.views.chat.page.page_messages import Chat
 import logging
+import app.views.chat.main_window as main_window_namespace
 
 logger = logging.getLogger(__name__)
 
 
 class MainController(AbstractController):
-    def __init__(self, view):
+    def __init__(self, view: main_window_namespace.MainView):
         super().__init__(view)
         self.view = view
-        logger.debug("MainController инициализирован")
+        logger.debug(f"MainController принял view: {view}")
 
+    def initialize(self):
         for neural_network in self.view.neural_networks:
             neural_network.clicked.connect(self.btn_clicked)
             neural_network.released.connect(self.btn_released)

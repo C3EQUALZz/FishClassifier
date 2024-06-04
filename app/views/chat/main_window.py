@@ -21,18 +21,23 @@ class MainView(QMainWindow):
     def __init__(self):
         super().__init__()
         logger.debug("Инициализация MainView")
+        self.settings = Settings()
+        logger.debug("Инициализация Settings")
 
         self.dragPos = None
-        self.neural_networks = []
+        self.neural_networks: list[FriendMessageButton] = []
 
         self.ui = UiMainWindow()
         self.ui.setupUi(self)
         logger.debug("Настроился UiMainWindow")
 
-        self.ui.app_pages.setCurrentWidget(self.ui.home)
+        self.add_chat_networks(
+            models_neural_network.NeuralNetworks(
+                pathlib.Path(self.settings["neural_networks_path"])
+            ).networks
+        )
 
-        self.settings = Settings()
-        logger.debug("Инициализация Settings")
+        self.ui.app_pages.setCurrentWidget(self.ui.home)
 
         self.left_menu = LeftMenu()
         logger.debug("Инициализация LeftMenu")
@@ -52,14 +57,8 @@ class MainView(QMainWindow):
         # Add btns to page
         # ///////////////////////////////////////////////////////////////
 
-        self.add_menus(
-            models_neural_network.NeuralNetworks(
-                pathlib.Path(self.settings["neural_networks_path"])
-            ).networks
-        )
-
-    def add_menus(self, users) -> None:
-        for _id, user in enumerate(users):
+    def add_chat_networks(self, networks:  list[models_neural_network.NeuralNetwork]) -> None:
+        for _id, user in enumerate(networks):
             neural_network = FriendMessageButton(_id,
                                                  user_image=user.network_image,
                                                  user_name=user.network_name,
@@ -69,6 +68,8 @@ class MainView(QMainWindow):
                                                  is_active=user.is_active)
 
             self.neural_networks.append(neural_network)
+            neural_network.clicked.connect(self.btn_clicked)
+            neural_network.released.connect(self.btn_released)
 
             logger.debug(f"Кнопка добавлена: {neural_network.objectName()}")
             self.ui.messages_layout.addWidget(neural_network)
@@ -98,3 +99,43 @@ class MainView(QMainWindow):
 
     def hide_window(self) -> None:
         self.close()
+
+
+    def btn_clicked(self):
+        logger.debug("Запущен btn_clicked")
+        # GET BT CLICKED
+        btn = self.sender()
+        logger.debug(f'Нажата кнопка: {btn}')
+
+        # UNSELECT CHATS
+        self.ui.ui_functions.UiFunctions.deselect_other_chat_messages(self.view, btn.objectName())
+
+        # SELECT CLICKED
+        if btn.objectName():
+            btn.reset_unread_message()
+            self.ui.ui_functions.ui_functions.UiFunctions.select_chat_message(self.view, btn.objectName())
+
+        # LOAD CHAT PAGE
+        if btn.objectName():
+            # REMOVE CHAT
+            for chat in reversed(range(self.ui.chat_layout.count())):
+                self.ui.chat_layout.itemAt(chat).widget().deleteLater()
+            self.chat = None
+
+            # SET CHAT WIDGET
+            self.chat = Chat(btn.user_image, btn.user_name, btn.user_description, btn.objectName(),
+                                  self.top_user.user_name)
+
+            # ADD WIDGET TO LAYOUT
+            self.ui.chat_layout.addWidget(self.chat)
+
+            # JUMP TO CHAT PAGE
+            self.ui.app_pages.setCurrentWidget(self.view.ui.chat)
+
+        # DEBUG
+        print(f"Button {btn.objectName()}, clicked!")
+
+    def btn_released(self):
+        # GET BT CLICKED
+        btn = self.sender()
+        print(F"Button {btn.objectName()}, released!")

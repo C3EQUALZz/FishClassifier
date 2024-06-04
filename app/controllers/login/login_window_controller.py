@@ -11,6 +11,8 @@ class LoginController(abstract_namespace.AbstractController):
     def __init__(self, view: login_view_namespace.LoginView) -> None:
         super().__init__(view)
         logger.debug("Инициализация LoginController")
+
+    def initialize(self) -> None:
         self.view.set_key_event_handlers(self.check_login)
 
     def check_login(self, event):

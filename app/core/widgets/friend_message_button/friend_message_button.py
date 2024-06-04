@@ -106,6 +106,7 @@ class FriendMessageButton(QWidget):
         if event.button() == Qt.LeftButton:
             # EMIT SIGNAL
             self.clicked.emit()
+            logger.debug(f"FriendMessageButton {self.objectName()} сигнал запущен")
 
     # MOUSE RELEASE
     # Event fired when the mouse leaves the BTN
@@ -113,6 +114,7 @@ class FriendMessageButton(QWidget):
         logger.debug(f"FriendMessageButton {self.objectName()} mouseReleaseEvent")
         if event.button() == Qt.LeftButton:
             self.released.emit()
+            logger.debug(f"FriendMessageButton {self.objectName()} сигнал запущен")
 
     # MOUSE ENTER
     # Event fired when the mouse enter
